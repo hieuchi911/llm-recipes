@@ -67,7 +67,7 @@ def train(model, train_dataloader, eval_dataloader, optimizer, lr_scheduler, gra
     epoch_times = []
     checkpoint_times = []
     results = {}
-    steps_per_eval = len(eval_dataloader)
+    steps_per_eval = len(eval_dataloader) if train_config.run_validation else None
     steps_per_epoch = len(train_dataloader)
     best_val_loss = float("inf")
     for epoch in range(train_config.num_epochs):
@@ -83,7 +83,7 @@ def train(model, train_dataloader, eval_dataloader, optimizer, lr_scheduler, gra
                     if train_config.enable_fsdp or distil_config.enable_fsdp:
                         batch[key] = batch[key].to(local_rank)
                     else:
-                        batch[key] = batch[key].to('cuda:0')
+                        batch[key] = batch[key].to('cuda')
 
                 with autocast():
                     if train_config.distillation:

@@ -109,17 +109,17 @@ class DistillationLoss(nn.Module):
             print(f"Student label shape: {student_answer_size[0]}")
             print(f"Teacher label shape: {teacher_answer_size[0]}")
             print("------- Student Label -> Prediction -------")
-            print(self.student_tokenizer.batch_decode(student_labels[0]))
-            print(self.student_tokenizer.batch_decode(torch.argmax(
+            print(self.student_tokenizer.decode(student_labels[0]))
+            print(self.student_tokenizer.decode(torch.argmax(
                 student[0][:student_answer_size[0]], dim=-1)))
             print("------- Teacher Label -> Prediction -------")
-            print(self.teacher_tokenizer.batch_decode(teacher_labels[0]))
-            print(self.teacher_tokenizer.batch_decode(torch.argmax(
+            print(self.teacher_tokenizer.decode(teacher_labels[0]))
+            print(self.teacher_tokenizer.decode(torch.argmax(
                 teacher[0][:teacher_answer_size[0]], dim=-1)))
             print("------- Prediction Teacher -> Student  -------")
-            print(self.teacher_tokenizer.batch_decode(torch.argmax(
+            print(self.teacher_tokenizer.decode(torch.argmax(
                 teacher[0][:teacher_answer_size[0]], dim=-1)))
-            print(self.student_tokenizer.batch_decode(torch.argmax(
+            print(self.student_tokenizer.decode(torch.argmax(
                 student[0][:student_answer_size[0]], dim=-1)))
             print("------- Shape -------")
             print(f"Student shape: {student.size()}")

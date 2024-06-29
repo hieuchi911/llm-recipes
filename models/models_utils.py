@@ -10,7 +10,7 @@ from models.distillation_model import DistillationModel
 from optimum.bettertransformer import BetterTransformer
 from transformers import AutoModelForCausalLM, MT5ForConditionalGeneration, AutoTokenizer
 from configs.configs_utils import generate_peft_config, update_config
-from peft import get_peft_model, prepare_model_for_int8_training
+from peft import get_peft_model, prepare_model_for_kbit_training
 from transformers.models.llama.modeling_llama import LlamaDecoderLayer
 from transformers.models.gpt_neox.modeling_gpt_neox import GPTNeoXLayer
 from transformers.models.mistral.modeling_mistral import MistralDecoderLayer
@@ -40,14 +40,14 @@ def load_model(train_config, rank):
             return MT5ForConditionalGeneration.from_pretrained(
                 train_config.model_name,
                 load_in_8bit=True if train_config.quantization else False,
-                device_map="auto" if train_config.quantization else None,
+                device_map="auto" if train_config.auto_dispatch else None,
                 use_cache=use_cache,
             )
         else:
             return AutoModelForCausalLM.from_pretrained(
                 train_config.model_name,
                 load_in_8bit=True if train_config.quantization else False,
-                device_map="auto" if train_config.quantization else None,
+                device_map="auto" if train_config.auto_dispatch else None,
                 use_cache=use_cache,
             )
     
@@ -80,7 +80,7 @@ def load_model(train_config, rank):
 
 def set_model(model, train_config, fsdp_config, rank, kwargs):
     if train_config.quantization:
-        model = prepare_model_for_int8_training(model)
+        model = prepare_model_for_kbit_training(model)
 
     if train_config.use_peft:
         peft_config = generate_peft_config(train_config, kwargs)
@@ -111,7 +111,7 @@ def set_model(model, train_config, fsdp_config, rank, kwargs):
         if fsdp_config.fsdp_activation_checkpointing: apply_fsdp_checkpointing(model)
         return model
     else:
-        if train_config.quantization: return model
+        if train_config.quantization or train_config.auto_dispatch: return model
         else:
             return model.to(f"cuda:{rank}")
 
