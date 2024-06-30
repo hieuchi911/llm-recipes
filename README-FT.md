@@ -11,6 +11,10 @@
   ```
   export PROJECT_DIR=cs566
   ```
+- Add an environment variable `PREFIX_PATH` with the value of the absolute to the folder `<teacher-name>` that stores the task-specific augmented datasets. For example, we augmented `cnn_dailymail` dataset with `Meta-Llama-3-70B-Instruct` model, and the train and validation splits are stored in: `/project/yzhao010_1246/llm-hallucination/generated/Meta-Llama-3-70B-Instruct/cnn_dailymail/train/`, then we do:
+  ```
+  export PREFIX_PATH=/project/yzhao010_1246/llm-hallucination/generated/
+  ```
 
 ## Run Distillation Process
 Below are some examples commands to run distillations in different hardware settings:

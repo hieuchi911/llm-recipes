@@ -3,6 +3,8 @@ import sys
 from datasets import load_from_disk
 
 sys.path.append(f"{os.getenv('HOME')}/{os.getenv('PROJECT_DIR')}/llm-distillation")
+PREFIX = os.getenv("PREFIX_PATH")
+
 from prompt.prompt import create_chat_prompt
 from prompt.prompt import create_prompt
 
@@ -10,13 +12,7 @@ def tokenize(item, tokenizer, encoder_decoder=False):
     is_chat = True if 'chat' in tokenizer.name_or_path.lower() or "instruct" in tokenizer.name_or_path.lower() else False
     task = "summary_news"
 
-    if tokenizer.name_or_path == "meta-llama/Llama-2-7b-chat-hf":
-        shot = 2
-    elif tokenizer.name_or_path == "mistralai/Mistral-7B-Instruct-v0.2":
-        shot = 2
-    elif tokenizer.name_or_path == "tiiuae/falcon-7b-instruct":
-        shot = 2
-    elif tokenizer.name_or_path == "meta-llama/Meta-Llama-3-70B-Instruct":
+    if tokenizer.name_or_path == "meta-llama/Meta-Llama-3-70B-Instruct":
         shot = 2
 
     if is_chat:
@@ -63,8 +59,7 @@ def tokenize(item, tokenizer, encoder_decoder=False):
         }
 
 def get_split(dataset_config, tokenizer, split):
-    dataset = load_from_disk(f"/project/yzhao010_1246/llm-hallucination/generated/{dataset_config.generated_by.split('/')[-1]}/cnn_dailymail/train/{split}")
-    # dataset = load_from_disk(f"{os.getenv('HOME')}/{os.getenv('PROJECT_DIR')}/llm-distillation-test/datasets/generated/Llama-2-7b-chat-hf/cnn_dailymail/{split}")
+    dataset = load_from_disk(f"{PREFIX}{dataset_config.generated_by.split('/')[-1]}/cnn_dailymail/train/{split}")
     if dataset_config.training_size < 1: dataset = dataset.select(range(int(len(dataset)*dataset_config.training_size)))
     dataset = dataset.map(lambda item: tokenize(item, tokenizer, dataset_config.encoder_decoder), remove_columns=list(dataset.features))
     dataset = dataset.filter(lambda x: len(x["input_ids"]) > 1)
